@@ -12,23 +12,6 @@ function element_mass_matrix(we::AbstractVector, grad_g::AbstractVector, Tv::Abs
     return Melem
 end
 
-function element_mass_matrix(we::AbstractVector, grad_g::AbstractVector, Tv::AbstractArray,zpts::AbstractMatrix,model::T,param_size::Int) where T
-    nq = size(zpts,2)
-    nvar = size(Tv, 2)
-    w = we .* grad_g
-    ndof = size(Tv, 1)
-    Melem = zeros(Float64, ndof, param_size)
-    J = zeros(Float64, param_size,nvar,nq)
-    for i in 1:nq
-        Tv_slice_1 = Tv[:, :, 1, i]
-        for j in 1:nvar
-            grads = Zygote.gradient(m-> m(zpts[:,i])[j], model)[1]
-            J[:,j,i] .= map_gradients_to_flat_vector(grads)
-        end
-        Melem += w[i] * Tv_slice_1 * transpose(J[:,:,i])
-    end
-    return Melem
-end
 # --- 6. inv_mass_matrix.m ---
 function inv_mass_matrix(w::AbstractVector, Gj::AbstractMatrix, Tv::AbstractArray)
     nelem, _ = size(Gj)
