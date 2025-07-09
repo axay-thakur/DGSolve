@@ -19,22 +19,7 @@ function inv_mass_matrix(w::AbstractVector, Gj::AbstractMatrix, Tv::AbstractArra
     Minv = zeros(Float64, ndof, ndof, nelem)
     for i in 1:nelem
         Melem_i = element_mass_matrix(w, Gj[i,:], Tv)
-        Minv[:, :, i] = inv(Melem_i)
-    end
-    return Minv
-end
-
-function inv_mass_matrix(w::AbstractVector, Gj::AbstractMatrix, Tv::AbstractArray,zpts::AbstractMatrix,model_dict::T,param_size::Int) where T
-    nelem, _ = size(Gj)
-    ndof = size(Tv, 1)
-    Minv = zeros(Float64, param_size,ndof, nelem)
-    # M_elem = zeros(Float64,ndof,param_size,nelem)
-    for i in 1:nelem
-        Melem_i = element_mass_matrix(w, Gj[i,:], Tv,zpts,model_dict[i],param_size)
-        # println(i)
-        # println(cond(Melem_i))
-        # M_elem[:,:,i] = Melem_i
-        Minv[:, :, i] = inv(Melem_i'*Melem_i+1e-6*I)*Melem_i' #pinv(Melem_i)
+        Minv[:, :, i] .= inv(Melem_i)
     end
     return Minv
 end
